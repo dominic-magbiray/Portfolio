@@ -9,6 +9,7 @@ This code can also answer all the business questions because we can now compare 
 */
 
 SELECT health_spending.state_usa,
+
 	ROUND(SUM(research_development_spent),2) AS Research_Dev,
 	ROUND (SUM(profit),2) 			AS profit,
 	ROUND(SUM(marketing_spent),2)		AS marketing_spent,
@@ -19,13 +20,15 @@ SELECT health_spending.state_usa,
 	ROUND(AVG(average_income) ,2)		AS avg_state_income
 
 FROM health_spending
+
 	FULL JOIN population ON population.state_usa = health_spending.state_usa
 	FULL JOIN corruption_convictions_per_capita ON corruption_convictions_per_capita.state_usa = health_spending.state_usa
 	FULL JOIN competitors ON health_spending.state_usa = competitors.state_usa
 	FULL JOIN property_prices ON health_spending.state_usa = property_prices.state_usa
 	FULL JOIN state_income ON health_spending.state_usa = state_income.state_usa
+	
 GROUP BY health_spending.state_usa
-ORDER BY avg_state_income desc
+ORDER BY avg_state_income DESC
 
 /*Upon checking the states, we saw that there is a state that only have one value in it 
 and it is the "District of Columbia" so we concluded that this is an outlier and does not
@@ -33,7 +36,7 @@ have an impact with our analysis so we deleted this state together with its data
 */
 
 DELETE FROM population
-WHERE state_usa = 'District of Columbia'
+	WHERE state_usa = 'District of Columbia'
 
 
 --DATA CLEANING, CHECKING FOR DUPLICATES, SPELLING CHECKS, AND CHECKING OF NULL VALUES
@@ -63,8 +66,12 @@ Using this code we can interchange the order by function to compare the columns.
 */
 
 SELECT state_income.state_usa,
-	CONCAT(ROUND(((average_income/(SELECT SUM(average_income) from state_income))*100),2),'%')as income_percentage,
-	CONCAT(ROUND((convictions_per_capita/ (SELECT SUM(convictions_per_capita) from corruption_convictions_per_capita))*100,2),'%')as corruption_percentage
+
+	CONCAT(ROUND(((average_income/(SELECT SUM(average_income) FROM state_income))*100),2),'%')as income_percentage,
+	CONCAT(ROUND((convictions_per_capita/ (SELECT SUM(convictions_per_capita) FROM corruption_convictions_per_capita))*100,2),'%')as corruption_percentage
+
 FROM state_income
+
 	JOIN corruption_convictions_per_capita ON corruption_convictions_per_capita.state_usa = state_income.state_usa
+
 ORDER BY income_percentage ASC
